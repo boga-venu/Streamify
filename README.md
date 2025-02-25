@@ -4,7 +4,8 @@
 
 Streamify is a sophisticated analytics dashboard built for music streaming platforms. This single-page application (SPA) delivers actionable insights through a combination of intuitive visualizations, interactive data exploration tools, and performance-optimized architecture. The dashboard enables music platform managers to make data-driven decisions by tracking key performance indicators, user growth patterns, revenue distribution, and content popularity.
 
-![Streamify Dashboard](dashboard.png)
+![Dashboard](https://github.com/user-attachments/assets/37768d44-9c23-493f-92d5-861084b9f8ec)
+
 
 ## Core Advantages
 
