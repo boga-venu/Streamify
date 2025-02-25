@@ -1,13 +1,13 @@
-// src/context/ThemeContext.jsx
+// Updated ThemeContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-    // Check if user has a preference saved in localStorage
+    // Always start with dark mode for Streamify
     const [darkMode, setDarkMode] = useState(() => {
         const savedTheme = localStorage.getItem('streamify-theme');
-        return savedTheme === 'dark';
+        return savedTheme === 'light' ? false : true; // Default to dark if no preference
     });
 
     // Toggle theme function
@@ -21,8 +21,12 @@ export function ThemeProvider({ children }) {
         
         if (darkMode) {
             document.documentElement.classList.add('dark');
+            document.body.style.backgroundColor = '#0F1116'; // Dark background
+            document.body.style.color = '#FFFFFF';
         } else {
             document.documentElement.classList.remove('dark');
+            document.body.style.backgroundColor = '#FFFFFF'; // Light background
+            document.body.style.color = '#111827';
         }
     }, [darkMode]);
 

@@ -1,20 +1,26 @@
-// Enhanced TopSongsChart.jsx
+// Updated TopSongsChart.jsx with Theme Support
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Music } from 'lucide-react';
+import { Music, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { mockData, formatNumber } from '../../data/mockData';
 import { useDashboard } from '../../context/DashboardContext';
+import { useTheme } from '../../context/ThemeContext';
 
 const CustomTooltip = ({ active, payload, label }) => {
+  const { darkMode } = useTheme();
+  
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-white/90 dark:bg-gray-900/90 p-4 border border-gray-200/70 dark:border-gray-800/70 rounded-lg shadow-xl backdrop-blur-md">
-        <p className="font-semibold text-gray-900 dark:text-white mb-1">{data.name}</p>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">by {data.artist}</p>
-        <div className="flex items-center space-x-1 text-sm">
-          <Music className="w-4 h-4 text-primary-500 dark:text-primary-400" />
-          <span className="font-medium text-gray-900 dark:text-white">{formatNumber(data.streams)} streams</span>
+      <div className={`${darkMode 
+        ? 'bg-surface-dark/90 border-surface-dark-border' 
+        : 'bg-white/90 border-gray-200/70'} 
+        p-4 border rounded-lg shadow-lg backdrop-blur-md`}>
+        <p className={`font-semibold ${darkMode ? 'text-text-dark-primary' : 'text-gray-900'} mb-1`}>{data.name}</p>
+        <p className={`text-sm ${darkMode ? 'text-text-dark-secondary' : 'text-gray-600'} mb-1`}>by {data.artist}</p>
+        <div className={`flex items-center space-x-1 text-sm`}>
+          <Music className={`w-4 h-4 ${darkMode ? 'text-primary-400' : 'text-primary-600'}`} />
+          <span className={`font-medium ${darkMode ? 'text-text-dark-primary' : 'text-gray-900'}`}>{formatNumber(data.streams)} streams</span>
         </div>
       </div>
     );
@@ -24,6 +30,8 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const TopSongsChart = () => {
   const { getCurrentData, activeSong, setActiveSong, setActiveArtist } = useDashboard();
+  const { darkMode } = useTheme();
+  
   const data = getCurrentData();
   const songsData = data?.topSongs || mockData.topSongs;
 
@@ -45,14 +53,18 @@ const TopSongsChart = () => {
     }
   };
 
+  const barColor = darkMode ? '#8B5CF6' : '#8B5CF6';  // Primary purple in both themes
+  const activeBarColor = darkMode ? '#A78BFA' : '#A78BFA';  // Lighter purple when active
+
   return (
-    <div className="bg-white dark:bg-gray-900 p-6 rounded-xl 
-                   shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)]
-                   border border-gray-100 dark:border-gray-800/70 
-                   transition-all duration-300 hover:shadow-[0_10px_40px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+    <div className={`${darkMode 
+      ? 'bg-surface-dark border-surface-dark-border/50' 
+      : 'bg-white border-gray-100'} 
+      backdrop-blur-md rounded-xl border p-5 transition-all duration-300 
+      ${darkMode ? 'hover:shadow-[0_4px_20px_rgba(0,0,0,0.3)]' : 'hover:shadow-lg'}`}>
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Top 5 Streamed Songs</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Most popular tracks this month</p>
+        <h2 className={`text-lg font-semibold ${darkMode ? 'text-text-dark-primary' : 'text-gray-900'}`}>Top Streamed Songs</h2>
+        <p className={`text-sm ${darkMode ? 'text-text-dark-secondary' : 'text-gray-500'}`}>Most popular tracks this month</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -63,32 +75,19 @@ const TopSongsChart = () => {
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               barSize={45}
             >
-              <defs>
-                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#6366f1" stopOpacity={1}/>
-                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity={1}/>
-                </linearGradient>
-                
-                <filter id="barGlow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur stdDeviation="6" result="blur" />
-                  <feFlood floodColor="#8b5cf6" floodOpacity="0.15" result="color" />
-                  <feComposite in="color" in2="blur" operator="in" result="glow" />
-                  <feMerge>
-                    <feMergeNode in="glow" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke={darkMode ? "rgba(55, 65, 81, 0.3)" : "#f0f0f0"} 
+                vertical={false} 
+              />
               
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} className="dark:stroke-gray-800" />
               <XAxis
                 dataKey="name"
-                stroke="#9CA3AF"
+                stroke={darkMode ? "#71717A" : "#9CA3AF"}
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
                 interval={0}
-                className="dark:stroke-gray-500"
                 tick={({ x, y, payload }) => (
                   <g transform={`translate(${x},${y})`}>
                     <text
@@ -96,8 +95,7 @@ const TopSongsChart = () => {
                       y={0}
                       dy={16}
                       textAnchor="middle"
-                      fill="#6B7280"
-                      className="dark:fill-gray-400"
+                      fill={darkMode ? "#A1A1AA" : "#6B7280"}
                       fontSize={12}
                     >
                       {payload.value.length > 15
@@ -107,15 +105,20 @@ const TopSongsChart = () => {
                   </g>
                 )}
               />
+              
               <YAxis
-                stroke="#9CA3AF"
+                stroke={darkMode ? "#71717A" : "#9CA3AF"}
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={formatNumber}
-                className="dark:stroke-gray-500"
               />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(243, 244, 246, 0.4)', className: 'dark:fill-gray-800/40' }} />
+              
+              <Tooltip 
+                content={<CustomTooltip />} 
+                cursor={{ fill: darkMode ? 'rgba(55, 65, 81, 0.3)' : 'rgba(243, 244, 246, 0.6)' }} 
+              />
+              
               <Bar
                 dataKey="streams"
                 onClick={handleSongSelect}
@@ -125,8 +128,7 @@ const TopSongsChart = () => {
                 {chartData.map((entry) => (
                   <Cell
                     key={entry.name}
-                    fill={activeSong === entry.name ? 'url(#barGradient)' : '#8B5CF6'}
-                    filter={activeSong === entry.name ? 'url(#barGlow)' : 'none'}
+                    fill={activeSong === entry.name ? activeBarColor : barColor}
                     style={{
                       opacity: activeSong && activeSong !== entry.name ? 0.6 : 1,
                       transition: 'all 0.3s ease'
@@ -138,7 +140,7 @@ const TopSongsChart = () => {
           </ResponsiveContainer>
         </div>
 
-        <div className="lg:border-l lg:border-gray-100 lg:dark:border-gray-800 lg:pl-6">
+        <div className={`lg:border-l ${darkMode ? 'lg:border-surface-dark-border/30' : 'lg:border-gray-100'} lg:pl-6`}>
           <div className="space-y-3">
             {chartData.map((song) => (
               <div
@@ -146,21 +148,30 @@ const TopSongsChart = () => {
                 onClick={() => handleSongSelect(song)}
                 className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-300
                   ${activeSong === song.name 
-                    ? 'bg-gradient-to-r from-indigo-50/80 to-purple-50/80 dark:from-indigo-900/20 dark:to-purple-900/20 ring-1 ring-indigo-100 dark:ring-indigo-800/30 transform scale-[1.02]' 
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-800/70'}`}
+                    ? darkMode
+                      ? 'bg-primary-500/10 border border-primary-500/20 transform scale-[1.02]' 
+                      : 'bg-primary-50 border border-primary-100 transform scale-[1.02]'
+                    : darkMode
+                      ? 'hover:bg-surface-dark-hover'
+                      : 'hover:bg-gray-50'
+                  }`}
               >
                 <span className={`flex items-center justify-center w-8 h-8 rounded-full 
                                 ${activeSong === song.name 
-                                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white' 
-                                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'} 
-                                text-sm font-medium shadow-sm`}>
+                                  ? darkMode
+                                    ? 'bg-primary-500 text-white' 
+                                    : 'bg-primary-500 text-white'
+                                  : darkMode
+                                    ? 'bg-surface-dark-hover text-text-dark-secondary'
+                                    : 'bg-gray-100 text-gray-600'
+                                } text-sm font-medium shadow-sm`}>
                   {song.rank}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{song.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{song.artist}</p>
+                  <p className={`text-sm font-medium ${darkMode ? 'text-text-dark-primary' : 'text-gray-900'} truncate`}>{song.name}</p>
+                  <p className={`text-xs ${darkMode ? 'text-text-dark-secondary' : 'text-gray-500'} truncate`}>{song.artist}</p>
                 </div>
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                <span className={`text-xs font-medium ${darkMode ? 'text-text-dark-secondary' : 'text-gray-600'}`}>
                   {formatNumber(song.streams)}
                 </span>
               </div>

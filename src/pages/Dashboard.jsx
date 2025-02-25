@@ -1,15 +1,15 @@
-// Enhanced Dashboard.jsx
+// Dashboard.jsx with Date Selector
 import React, { useEffect } from 'react';
-import { Users, PlayCircle, Music, DollarSign, Trophy } from 'lucide-react';
+import { Users, Headphones, Music2, DollarSign, Trophy } from 'lucide-react';
 import MetricCard from '../components/dashboard/MetricCard';
 import UserGrowthChart from '../components/dashboard/UserGrowthChart';
 import RevenueChart from '../components/dashboard/RevenueChart';
 import TopSongsChart from '../components/dashboard/TopSongsChart';
 import StreamsTable from '../components/dashboard/StreamsTable';
 import DateRangeSelector from '../components/dashboard/DateRangeSelector';
-import Skeleton from '../components/ui/Skeleton';
 import { useDashboard } from '../context/DashboardContext';
 import { formatNumber, formatCurrency } from '../data/mockData';
+import { useTheme } from '../context/ThemeContext';
 
 const Dashboard = () => {
     const { 
@@ -19,47 +19,49 @@ const Dashboard = () => {
         fetchDashboardData,
         currentData 
     } = useDashboard();
+    
+    const { darkMode } = useTheme();
 
     useEffect(() => {
+        // Fetch data when component mounts or date range changes
         fetchDashboardData(dateRange);
     }, [dateRange, fetchDashboardData]);
 
-    if (isLoading) {
+    // Check if data is available
+    const isDataAvailable = currentData && Object.keys(currentData).length > 0;
+
+    if (isLoading || !isDataAvailable) {
         return <DashboardSkeleton />;
     }
 
     const metrics = [
         {
             title: "Total Users",
-            value: formatNumber(currentData.totalUsers),
-            trend: currentData.userGrowth,
+            value: formatNumber(currentData.totalUsers || 0),
+            trend: currentData.userGrowth || 0,
             icon: Users,
-            trendLabel: "vs. last month"
         },
         {
             title: "Active Users",
-            value: formatNumber(currentData.activeUsers),
-            trend: currentData.userGrowth,
-            icon: PlayCircle,
-            trendLabel: "vs. last month"
+            value: formatNumber(currentData.activeUsers || 0),
+            trend: currentData.userGrowth || 0,
+            icon: Headphones,
         },
         {
             title: "Total Streams",
-            value: formatNumber(currentData.totalStreams),
-            trend: currentData.streamGrowth,
-            icon: Music,
-            trendLabel: "vs. last month"
+            value: formatNumber(currentData.totalStreams || 0),
+            trend: currentData.streamGrowth || 0,
+            icon: Music2,
         },
         {
             title: "Revenue",
-            value: formatCurrency(currentData.revenue),
-            trend: currentData.revenueGrowth,
+            value: formatCurrency(currentData.revenue || 0),
+            trend: currentData.revenueGrowth || 0,
             icon: DollarSign,
-            trendLabel: "vs. last month"
         },
         {
             title: "Top Artist",
-            value: currentData.topArtist,
+            value: currentData.topArtist || 'N/A',
             trend: null,
             icon: Trophy,
             showTrend: false
@@ -68,19 +70,19 @@ const Dashboard = () => {
 
     return (
         <div className="space-y-8">
-            {/* Header with subtle gradient backdrop */}
-            <div className="relative py-6 px-8 -mx-8 -mt-8 mb-12 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 border-b border-gray-100 dark:border-gray-800/50">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-50/10 to-purple-50/5 dark:from-indigo-900/10 dark:to-purple-900/5"></div>
-                <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Dashboard Overview</h1>
-                        <p className="text-gray-500 dark:text-gray-400 mt-1.5">Track your music streaming metrics and performance</p>
-                    </div>
-                    <DateRangeSelector
-                        selectedRange={dateRange}
-                        onRangeChange={setDateRange}
-                    />
+            {/* Header with Date Range Selector */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className={`text-2xl md:text-3xl font-bold tracking-tight ${darkMode ? 'text-text-dark-primary' : 'text-gray-900'}`}>Dashboard Overview</h1>
+                    <p className={`${darkMode ? 'text-text-dark-secondary' : 'text-gray-500'} mt-1.5`}>Track your music streaming metrics and performance</p>
                 </div>
+                <DateRangeSelector
+                    selectedRange={dateRange}
+                    onRangeChange={(range) => {
+                        setDateRange(range);
+                        fetchDashboardData(range);
+                    }}
+                />
             </div>
 
             {/* Metrics Grid */}
@@ -92,7 +94,6 @@ const Dashboard = () => {
                         value={metric.value}
                         trend={metric.trend}
                         icon={metric.icon}
-                        trendLabel={metric.trendLabel}
                         showTrend={metric.showTrend !== false}
                     />
                 ))}
@@ -115,33 +116,57 @@ const Dashboard = () => {
 };
 
 const DashboardSkeleton = () => {
-    // Enhanced skeleton with gradient pulse effect
+    const { darkMode } = useTheme();
+    
     return (
         <div className="space-y-8">
-            <div className="py-6 px-8 -mx-8 -mt-8 mb-12 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
+            {/* Header Skeleton */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <Skeleton className="h-9 w-64 bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-700" />
-                    <Skeleton className="h-5 w-96 mt-2 bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-700" />
+                    <div className={`h-8 w-64 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded-lg animate-pulse`}></div>
+                    <div className={`h-4 w-96 mt-2 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded-lg animate-pulse`}></div>
                 </div>
-                <Skeleton className="h-10 w-40 mt-4 ml-auto bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-700" />
+                <div className={`h-10 w-40 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded-lg animate-pulse`}></div>
             </div>
 
+            {/* Metrics Grid Skeleton */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 {[...Array(5)].map((_, i) => (
-                    <div key={i} className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800/50">
-                        <div className="flex items-center justify-between">
-                            <Skeleton className="h-8 w-8 rounded-lg bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-700" />
-                            <Skeleton className="h-6 w-16 rounded-full bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-700" />
+                    <div key={i} className={`${darkMode ? 'bg-surface-dark border-surface-dark-border/30' : 'bg-white border-gray-100'} rounded-xl p-5 border`}>
+                        <div className="flex items-center justify-between mb-4">
+                            <div className={`h-10 w-10 rounded-lg ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} animate-pulse`}></div>
+                            <div className={`h-6 w-16 rounded-full ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} animate-pulse`}></div>
                         </div>
-                        <Skeleton className="h-8 w-32 mt-5 bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-700" />
+                        <div className={`h-4 w-24 mb-2 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded animate-pulse`}></div>
+                        <div className={`h-7 w-32 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded animate-pulse`}></div>
                     </div>
                 ))}
             </div>
 
+            {/* Charts Grid Skeleton */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <Skeleton className="h-[400px] rounded-xl bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-700" />
-                <Skeleton className="h-[400px] rounded-xl bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-700" />
-                <Skeleton className="h-[400px] rounded-xl lg:col-span-2 bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-700" />
+                <div className={`${darkMode ? 'bg-surface-dark border-surface-dark-border/30' : 'bg-white border-gray-100'} rounded-xl p-5 border h-[350px]`}>
+                    <div className={`h-6 w-48 mb-2 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded animate-pulse`}></div>
+                    <div className={`h-4 w-32 mb-6 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded animate-pulse`}></div>
+                    <div className={`h-[260px] ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded-lg animate-pulse`}></div>
+                </div>
+                <div className={`${darkMode ? 'bg-surface-dark border-surface-dark-border/30' : 'bg-white border-gray-100'} rounded-xl p-5 border h-[350px]`}>
+                    <div className={`h-6 w-48 mb-2 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded animate-pulse`}></div>
+                    <div className={`h-4 w-32 mb-6 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded animate-pulse`}></div>
+                    <div className={`h-[260px] ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded-lg animate-pulse`}></div>
+                </div>
+                <div className={`lg:col-span-2 ${darkMode ? 'bg-surface-dark border-surface-dark-border/30' : 'bg-white border-gray-100'} rounded-xl p-5 border h-[400px]`}>
+                    <div className={`h-6 w-48 mb-2 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded animate-pulse`}></div>
+                    <div className={`h-4 w-32 mb-6 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded animate-pulse`}></div>
+                    <div className={`h-[320px] ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded-lg animate-pulse`}></div>
+                </div>
+            </div>
+
+            {/* Table Skeleton */}
+            <div className={`${darkMode ? 'bg-surface-dark border-surface-dark-border/30' : 'bg-white border-gray-100'} rounded-xl p-5 border mt-8`}>
+                <div className={`h-6 w-48 mb-2 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded animate-pulse`}></div>
+                <div className={`h-4 w-64 mb-6 ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded animate-pulse`}></div>
+                <div className={`h-[400px] ${darkMode ? 'bg-surface-dark-hover' : 'bg-gray-200'} rounded-lg animate-pulse`}></div>
             </div>
         </div>
     );

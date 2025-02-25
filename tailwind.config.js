@@ -9,55 +9,116 @@ export default {
   theme: {
     extend: {
       colors: {
-        surface: {
-          50: '#f9fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
+        // Main background colors
+        background: {
+          dark: '#0F1116',
+          card: '#181A22',
+          light: '#FFFFFF'
         },
+        // Primary brand colors
         primary: {
-          50: '#ebf4ff',
-          100: '#cee3fe',
-          500: '#3a6ff8',
-          600: '#2552e6',
-          700: '#1e40af',
-          900: '#172554',
+          50: '#F3EFFB',
+          100: '#E9E1F8',
+          200: '#D5C4F1',
+          300: '#BEA2EA',
+          400: '#A27EE3',
+          500: '#8B5CF6', // Main purple
+          600: '#6D48D7',
+          700: '#5336B3',
+          800: '#3C278F',
+          900: '#281C6B',
         },
+        // Secondary accent colors
+        secondary: {
+          50: '#ECFEFF',
+          100: '#D8FDFF',
+          200: '#B6F8FF',
+          300: '#8AEEFF',
+          400: '#36DFFF',
+          500: '#06B6D4', // Main cyan
+          600: '#0892B3',
+          700: '#066F8E',
+          800: '#045169',
+          900: '#032C3A',
+        },
+        // Additional accent colors
         accent: {
-          300: '#7eeafc',
-          400: '#38d9f8',
-          500: '#0ac5e4',
-          600: '#0687a8',
+          blue: {
+            500: '#3B82F6',
+          },
+          teal: {
+            500: '#14B8A6',
+          },
+          green: {
+            500: '#10B981',
+          },
+          rose: {
+            500: '#F43F5E',
+          }
         },
-        success: {
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
+        // UI elements
+        surface: {
+          dark: {
+            DEFAULT: 'rgba(24, 26, 34, 0.6)',
+            hover: 'rgba(32, 35, 45, 0.6)',
+            active: 'rgba(40, 43, 54, 0.6)',
+            border: 'rgba(55, 59, 69, 0.5)',
+          },
+          light: {
+            DEFAULT: '#FFFFFF',
+            hover: '#F9FAFB',
+            active: '#F3F4F6',
+            border: '#E5E7EB',
+          }
         },
-        warning: {
-          400: '#fbc218',
-          500: '#f59e0b',
-          600: '#d97706',
-        },
-        danger: {
-          400: '#fb7185',
-          500: '#f43f5e',
-          600: '#e11d48',
-        },
-        gold: {
-          100: '#f8f0d7',
-          200: '#f5dcab',
-          300: '#f7d986',
-          400: '#f7cb61',
-        },
+        // Text colors
+        text: {
+          dark: {
+            primary: '#FFFFFF',
+            secondary: '#A1A1AA',
+            tertiary: '#71717A',
+            inverse: '#111827',
+          },
+          light: {
+            primary: '#111827',
+            secondary: '#4B5563',
+            tertiary: '#6B7280',
+            inverse: '#FFFFFF',
+          }
+        }
       },
       boxShadow: {
-        'card': '0 4px 20px rgba(0, 0, 0, 0.08)',
-        'card-hover': '0 10px 40px rgba(0, 0, 0, 0.12)',
-        'card-dark': '0 4px 20px rgba(0, 0, 0, 0.3)',
-        'card-dark-hover': '0 10px 40px rgba(0, 0, 0, 0.5)',
+        'glow-sm': '0 0 8px rgba(139, 92, 246, 0.3)',
+        'glow-md': '0 0 16px rgba(139, 92, 246, 0.3)',
+        'glow-lg': '0 0 24px rgba(139, 92, 246, 0.3)',
+        'glow-xl': '0 0 32px rgba(139, 92, 246, 0.3)',
+        'glow-cyan-sm': '0 0 8px rgba(6, 182, 212, 0.3)',
+        'glow-cyan-md': '0 0 16px rgba(6, 182, 212, 0.3)',
+        'card-dark': '0 8px 16px rgba(0, 0, 0, 0.2)',
+        'card-light': '0 4px 12px rgba(0, 0, 0, 0.08)'
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-glow': 'linear-gradient(180deg, rgba(139, 92, 246, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%)',
+        'gradient-primary': 'linear-gradient(90deg, #8B5CF6 0%, #06B6D4 100%)'
+      },
+      backdropBlur: {
+        xs: '2px',
+      },
+      animation: {
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
+        'float': 'float 3s ease-in-out infinite',
+      },
+      keyframes: {
+        glow: {
+          '0%': { opacity: 0.5 },
+          '100%': { opacity: 1 },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
       },
     },
   },
