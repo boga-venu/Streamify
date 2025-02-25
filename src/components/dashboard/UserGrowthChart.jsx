@@ -1,11 +1,11 @@
-// Fixed UserGrowthChart.jsx
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { mockData, formatNumber } from '../../data/mockData';
 import { useDashboard } from '../../context/DashboardContext';
 import { useTheme } from '../../context/ThemeContext';
 
-const CustomTooltip = ({ active, payload, label }) => {
+// Extracted to its own component with memo for better re-render control
+const CustomTooltip = React.memo(({ active, payload, label }) => {
   const { darkMode } = useTheme();
   
   if (active && payload && payload.length) {
@@ -31,14 +31,19 @@ const CustomTooltip = ({ active, payload, label }) => {
     );
   }
   return null;
-};
+});
+
+CustomTooltip.displayName = 'CustomTooltip';
 
 const UserGrowthChart = () => {
   const { getCurrentData, focusedTimeRange, setFocusedTimeRange } = useDashboard();
   const { darkMode } = useTheme();
   
-  const data = getCurrentData();
-  const growthData = data?.userGrowthData || mockData.userGrowthData;
+  // Memoize data to prevent unnecessary recalculations
+  const data = useMemo(() => {
+    const currentData = getCurrentData();
+    return currentData?.userGrowthData || mockData.userGrowthData;
+  }, [getCurrentData]);
   
   const handleMouseMove = useCallback((data) => {
     if (data && data.activePayload) {
@@ -56,9 +61,27 @@ const UserGrowthChart = () => {
     setFocusedTimeRange(null);
   }, [setFocusedTimeRange]);
 
-  // Colors
-  const totalUsersColor = '#8859A8';  // refined plum
-  const activeUsersColor = '#48A49A';  // muted emerald/teal
+  // Memoize colors to prevent recreating on every render
+  const colors = useMemo(() => {
+    return {
+      totalUsersColor: '#8b5cf6',  // purple
+      activeUsersColor: '#06b6d4',  // cyan
+    };
+  }, []);
+
+  // Memoize gradient definitions to prevent recreating on every render
+  const gradientDefs = useMemo(() => (
+    <defs>
+      <linearGradient id="totalUsersGradient" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="5%" stopColor={colors.totalUsersColor} stopOpacity={0.3}/>
+        <stop offset="95%" stopColor={colors.totalUsersColor} stopOpacity={0}/>
+      </linearGradient>
+      <linearGradient id="activeUsersGradient" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="5%" stopColor={colors.activeUsersColor} stopOpacity={0.3}/>
+        <stop offset="95%" stopColor={colors.activeUsersColor} stopOpacity={0}/>
+      </linearGradient>
+    </defs>
+  ), [colors]);
 
   return (
     <div className={`${darkMode 
@@ -85,21 +108,12 @@ const UserGrowthChart = () => {
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart 
-            data={growthData}
+            data={data}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <defs>
-              <linearGradient id="totalUsersGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={totalUsersColor} stopOpacity={0.3}/>
-                <stop offset="95%" stopColor={totalUsersColor} stopOpacity={0}/>
-              </linearGradient>
-              <linearGradient id="activeUsersGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={activeUsersColor} stopOpacity={0.3}/>
-                <stop offset="95%" stopColor={activeUsersColor} stopOpacity={0}/>
-              </linearGradient>
-            </defs>
+            {gradientDefs}
             
             <CartesianGrid 
               strokeDasharray="3 3" 
@@ -127,7 +141,7 @@ const UserGrowthChart = () => {
             <Tooltip 
               content={<CustomTooltip />}
               cursor={{ 
-                stroke: totalUsersColor, 
+                stroke: colors.totalUsersColor, 
                 strokeWidth: 1, 
                 strokeDasharray: '5 5' 
               }}
@@ -137,12 +151,12 @@ const UserGrowthChart = () => {
               type="monotone"
               dataKey="totalUsers"
               name="Total Users"
-              stroke={totalUsersColor}
+              stroke={colors.totalUsersColor}
               strokeWidth={2.5}
               dot={false}
               activeDot={{ 
                 r: 6, 
-                stroke: totalUsersColor,
+                stroke: colors.totalUsersColor,
                 strokeWidth: 2,
                 fill: darkMode ? '#181A22' : '#ffffff',
               }}
@@ -154,12 +168,12 @@ const UserGrowthChart = () => {
               type="monotone"
               dataKey="activeUsers"
               name="Active Users"
-              stroke={activeUsersColor}
+              stroke={colors.activeUsersColor}
               strokeWidth={2.5}
               dot={false}
               activeDot={{ 
                 r: 6, 
-                stroke: activeUsersColor,
+                stroke: colors.activeUsersColor,
                 strokeWidth: 2,
                 fill: darkMode ? '#181A22' : '#ffffff',
               }}
@@ -182,4 +196,5 @@ const UserGrowthChart = () => {
   );
 };
 
-export default UserGrowthChart;
+// Wrap with memo to prevent re-renders when parent changes but props don't
+export default React.memo(UserGrowthChart);

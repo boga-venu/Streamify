@@ -4,11 +4,7 @@
 
 Streamify is a sophisticated analytics dashboard built for music streaming platforms. This single-page application (SPA) delivers actionable insights through a combination of intuitive visualizations, interactive data exploration tools, and performance-optimized architecture. The dashboard enables music platform managers to make data-driven decisions by tracking key performance indicators, user growth patterns, revenue distribution, and content popularity.
 
-![Screenshot (29)](https://github.com/user-attachments/assets/07e78b34-95fe-4b68-8c89-465e890f0e4e)
-
-
-LINK: https://my-streamify.vercel.app/
-
+![Streamify Dashboard](dashboard.png)
 
 ## Core Advantages
 
@@ -259,4 +255,4 @@ Streamify represents a thoughtfully designed analytics solution that balances co
 
 ---
 
-Designed and developed with ♥ | Venu Gopal Boga
+Designed and developed with ♥ | [Your Name or Company]
