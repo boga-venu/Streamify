@@ -1,3 +1,4 @@
+// Mobile-optimized StreamsTable.jsx
 import React, { useState, useMemo, useCallback } from 'react';
 import { 
   useReactTable, 
@@ -110,7 +111,7 @@ const StreamsTable = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  // Column definitions
+  // Column definitions - more responsive for mobile
   const columns = useMemo(() => [
     {
       accessorKey: 'song',
@@ -118,6 +119,8 @@ const StreamsTable = () => {
       cell: (info) => (
         <SongArtistCell getValue={info.getValue} row={info.row} darkMode={darkMode} />
       ),
+      // Ensure this column is wider on mobile
+      size: 140,
     },
     {
       accessorKey: 'dailyStreams',
@@ -125,6 +128,8 @@ const StreamsTable = () => {
       cell: (info) => (
         <NumberCell getValue={info.getValue} darkMode={darkMode} />
       ),
+      // Make this column adaptable for mobile
+      size: 100,
     },
     {
       accessorKey: 'uniqueListeners',
@@ -132,6 +137,8 @@ const StreamsTable = () => {
       cell: (info) => (
         <NumberCell getValue={info.getValue} darkMode={darkMode} />
       ),
+      // Hidden on smallest screens, visible on larger ones
+      size: 100,
     },
     {
       accessorKey: 'trend',
@@ -139,6 +146,8 @@ const StreamsTable = () => {
       cell: (info) => (
         <TrendCell getValue={info.getValue} darkMode={darkMode} />
       ),
+      // Keep this column visible due to its importance and small size
+      size: 80,
     },
   ], [darkMode]);
 
@@ -212,20 +221,24 @@ const StreamsTable = () => {
       : 'bg-white border-gray-100'} 
       backdrop-blur-md rounded-xl border p-5 transition-all duration-300 
       ${darkMode ? 'hover:shadow-[0_4px_20px_rgba(0,0,0,0.3)]' : 'hover:shadow-lg'}`}>
-      <div className="flex justify-between items-start mb-6">
+      
+      {/* Mobile-optimized header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <div>
           <h2 className={`text-lg font-semibold ${darkMode ? 'text-text-dark-primary' : 'text-gray-900'}`}>Recent Streams</h2>
           <p className={`text-sm ${darkMode ? 'text-text-dark-secondary' : 'text-gray-500'}`}>Detailed view of streaming activity</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
+        
+        {/* Responsive search & filters */}
+        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2">
+          <div className="relative flex-grow">
             <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${darkMode ? 'text-text-dark-tertiary' : 'text-gray-400'} w-4 h-4`} />
             <input
               type="text"
               placeholder="Search streams..."
               value={globalFilter}
               onChange={handleGlobalFilterChange}
-              className={`pl-10 pr-4 py-2 border rounded-lg 
+              className={`w-full pl-10 pr-4 py-2 border rounded-lg 
                         ${darkMode 
                           ? 'bg-surface-dark-hover border-surface-dark-border/50 text-text-dark-primary placeholder-text-dark-tertiary' 
                           : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400'} 
@@ -235,7 +248,7 @@ const StreamsTable = () => {
           </div>
           <button
             onClick={toggleFilters}
-            className={`p-2 border rounded-lg 
+            className={`sm:flex-shrink-0 p-2 border rounded-lg 
                       ${showFilters 
                         ? darkMode
                           ? 'bg-primary-500/20 text-primary-400 border-primary-500/30' 
@@ -254,9 +267,9 @@ const StreamsTable = () => {
         </div>
       </div>
 
-      {/* Column Filters */}
+      {/* Column Filters - improved for mobile */}
       {showFilters && (
-        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 p-4 rounded-lg
+        <div className={`grid grid-cols-1 gap-4 mb-6 p-4 rounded-lg
                       ${darkMode 
                         ? 'bg-surface-dark-hover/50 border border-surface-dark-border/30' 
                         : 'bg-gray-50 border border-gray-100/80'}`}>
@@ -295,46 +308,60 @@ const StreamsTable = () => {
         </div>
       )}
 
-      {/* Table */}
-      <div className="overflow-x-auto">
+      {/* Table - with mobile optimizations */}
+      <div className="overflow-x-auto -mx-5 px-5">
         {filteredData.length > 0 ? (
-          <table className="w-full">
-            <thead>
-              <tr className={`border-b ${darkMode ? 'border-surface-dark-border/30' : 'border-gray-100'}`}>
-                {table.getFlatHeaders().map((header) => (
-                  <th
-                    key={header.id}
-                    className={`px-4 py-3 text-left text-xs font-medium ${darkMode ? 'text-text-dark-tertiary' : 'text-gray-500'} uppercase tracking-wider cursor-pointer`}
-                    onClick={header.column.getToggleSortingHandler()}
-                  >
-                    <ColumnHeader header={header} darkMode={darkMode} />
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className={`divide-y ${darkMode ? 'divide-surface-dark-border/30' : 'divide-gray-100'}`}>
-              {table.getRowModel().rows.map((row) => (
-                <tr 
-                  key={row.id}
-                  className={`transition-colors duration-150 ${darkMode ? 'hover:bg-primary-500/5' : 'hover:bg-primary-50/40'}`}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-4 whitespace-nowrap">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
+          <div className="min-w-full inline-block align-middle">
+            <div className="overflow-hidden">
+              <table className="min-w-full">
+                <thead>
+                  <tr className={`border-b ${darkMode ? 'border-surface-dark-border/30' : 'border-gray-100'}`}>
+                    {table.getFlatHeaders().map((header) => {
+                      // Hide "Unique Listeners" column on mobile
+                      const isMobileHidden = header.id === 'uniqueListeners' ? 'hidden sm:table-cell' : '';
+                      
+                      return (
+                        <th
+                          key={header.id}
+                          className={`px-4 py-3 text-left text-xs font-medium ${darkMode ? 'text-text-dark-tertiary' : 'text-gray-500'} uppercase tracking-wider cursor-pointer ${isMobileHidden}`}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          <ColumnHeader header={header} darkMode={darkMode} />
+                        </th>
+                      );
+                    })}
+                  </tr>
+                </thead>
+                <tbody className={`divide-y ${darkMode ? 'divide-surface-dark-border/30' : 'divide-gray-100'}`}>
+                  {table.getRowModel().rows.map((row) => (
+                    <tr 
+                      key={row.id}
+                      className={`transition-colors duration-150 ${darkMode ? 'hover:bg-primary-500/5' : 'hover:bg-primary-50/40'}`}
+                    >
+                      {row.getVisibleCells().map((cell) => {
+                        // Hide "Unique Listeners" column on mobile
+                        const isMobileHidden = cell.column.id === 'uniqueListeners' ? 'hidden sm:table-cell' : '';
+                        
+                        return (
+                          <td key={cell.id} className={`px-4 py-4 whitespace-nowrap ${isMobileHidden}`}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </td>
+                        );
+                      })}
+                    </tr>
                   ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                </tbody>
+              </table>
+            </div>
+          </div>
         ) : (
           <NoDataDisplay darkMode={darkMode} />
         )}
       </div>
 
-      {/* Pagination */}
+      {/* Pagination - mobile optimized */}
       {filteredData.length > 0 && (
-        <div className="flex items-center justify-between mt-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6">
           <div className="flex items-center gap-2">
             <select
               value={pageSize}
@@ -356,7 +383,7 @@ const StreamsTable = () => {
             </span>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center justify-center sm:justify-end space-x-2">
             <button
               onClick={handlePreviousPage}
               disabled={!canPreviousPage}
