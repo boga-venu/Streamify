@@ -256,4 +256,4 @@ Streamify represents a thoughtfully designed analytics solution that balances co
 
 ---
 
-Designed and developed with ♥ | [Your Name or Company]
+Designed and developed with ♥ 
